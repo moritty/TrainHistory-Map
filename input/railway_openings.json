@@ -602,5 +602,55 @@
         35.6661
       ]
     ]
+  },
+  {
+    "id": "tokyo-private-1927-21",
+    "order": 21,
+    "openedDate": "1927-04-16",
+    "openedYear": 1927,
+    "name": "高田馬場〜東村山",
+    "companyAtOpening": "西武鉄道",
+    "currentOperator": "西武鉄道",
+    "currentLineImage": "西武新宿線",
+    "area": "新宿・中野・杉並・練馬・西東京・東村山",
+    "theme": "西武新宿線の都心側進出",
+    "status": "opened",
+    "category": "private_railway",
+    "systemType": "electric_railway",
+    "displayColor": "#22c55e",
+    "needsVerification": true,
+    "sourceStatus": "official_year_section_confirmed_date_secondary",
+    "notes": "西武鉄道公式では1927年に東村山〜高田馬場間が開業し、現在の新宿線の始まりとなったことを確認。開業日は追加検証対象として扱う。",
+    "geojsonFile": "geojson/tokyo_private_1927_21.geojson",
+    "approxCoordinates": [
+      [
+        139.7037,
+        35.7123
+      ],
+      [
+        139.6864,
+        35.7157
+      ],
+      [
+        139.6399,
+        35.7225
+      ],
+      [
+        139.5928,
+        35.7263
+      ],
+      [
+        139.5405,
+        35.7273
+      ],
+      [
+        139.4882,
+        35.7365
+      ],
+      [
+        139.4634,
+        35.7602
+      ]
+    ]
   }
 ]

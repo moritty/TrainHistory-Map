@@ -50,7 +50,7 @@ TODO と保留事項は [docs/todo.md](./docs/todo.md) に記録します。
 
 関東 JR 主要路線の追加方針は [docs/kanto_jr_major_lines_v1.md](./docs/kanto_jr_major_lines_v1.md) に記録します。
 
-東京都内の私鉄開業史 20 件の入力データは `input/` に受領し、アプリ表示用には `public/data/railway_openings.json` と `data/railway_openings.json` に配置します。
+東京都内の私鉄開業史 21 件の入力データは `input/` に受領し、アプリ表示用には `public/data/railway_openings.json` と `data/railway_openings.json` に配置します。
 
 ## MVP 達成内容
 
@@ -85,7 +85,7 @@ TODO と保留事項は [docs/todo.md](./docs/todo.md) に記録します。
 
 2026-05-17 時点では、山手線以外の関東 JR 主要 10 路線を概略表示 v1 として追加しています。これらは `needs-verification` 扱いで、今後の精査対象です。
 
-同日、東京都内の私鉄開業史 20 件を追加しました。1902 年以降、東武・京急・玉電・京成・京王・東武東上・西武池袋・東急系の初期区間が、選択年に応じて表示されます。現時点では `approxCoordinates` による概略線で、後から `public/data/geojson/*.geojson` の検証済み線形へ差し替える前提です。
+同日、東京都内の私鉄開業史 21 件を追加しました。1902 年以降、東武・京急・玉電・京成・京王・東武東上・西武池袋・西武新宿・東急系の初期区間が、選択年に応じて表示されます。現時点では `approxCoordinates` による概略線で、後から `public/data/geojson/*.geojson` の検証済み線形へ差し替える前提です。
 
 MVP では扱わないもの:
 
