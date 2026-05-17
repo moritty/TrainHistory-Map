@@ -22,6 +22,39 @@ export type RailwaySegment = {
   geoLine: GeoPoint[];
   geojsonFile: string | null;
   sourceRefs: string[];
+  openedDate?: string;
+  companyAtOpening?: string;
+  currentOperator?: string;
+  currentLineImage?: string;
+  area?: string;
+  theme?: string;
+  systemType?: string;
+  needsVerification?: boolean;
+  sourceStatus?: string;
+  notes?: string;
+  sourceStatusLabel?: string;
+};
+
+export type PrivateRailwayOpening = {
+  id: string;
+  order: number;
+  openedDate: string;
+  openedYear: number;
+  name: string;
+  companyAtOpening: string;
+  currentOperator: string;
+  currentLineImage: string;
+  area: string;
+  theme: string;
+  status: "opened" | "closed";
+  category: "private_railway";
+  systemType: string;
+  displayColor: string;
+  needsVerification: boolean;
+  sourceStatus: string;
+  notes: string;
+  geojsonFile: string;
+  approxCoordinates: [number, number][];
 };
 
 export type Station = {

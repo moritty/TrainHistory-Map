@@ -77,6 +77,7 @@ export function YamanoteHistoryMap() {
   const [data, setData] = useState<RailwayData>(EMPTY_DATA);
   const [selectedYear, setSelectedYear] = useState(1885);
   const [summaryOverride, setSummaryOverride] = useState<string | null>(null);
+  const [selectedSegment, setSelectedSegment] = useState<RailwaySegment | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [playbackInterval, setPlaybackInterval] = useState<(typeof PLAYBACK_SPEEDS)[number]["interval"]>(1000);
   const [isMapReady, setIsMapReady] = useState(false);
@@ -219,8 +220,11 @@ export function YamanoteHistoryMap() {
         lineJoin: "round",
       }).addTo(railwayLayer);
 
-      polyline.bindPopup(`<strong>${segment.name}</strong><br>${segment.openedYear}年開業<br>${segment.description}`);
+      polyline.bindPopup(
+        `<strong>${segment.name}</strong><br>${segment.openedDate ?? `${segment.openedYear}年`}開業<br>${segment.description}`,
+      );
       polyline.on("click", () => {
+        setSelectedSegment(segment);
         setSummaryOverride(
           `${segment.name}: ${segment.openedYear}年開業。現在の選択年では「${labelStatus(status)}」です。${segment.description}`,
         );
@@ -251,6 +255,7 @@ export function YamanoteHistoryMap() {
 
   useEffect(() => {
     setSummaryOverride(null);
+    setSelectedSegment(null);
   }, [selectedYear]);
 
   useEffect(() => {
@@ -348,6 +353,44 @@ export function YamanoteHistoryMap() {
             <h2>この年の見え方</h2>
             <p>{errorMessage ?? yearSummary}</p>
           </section>
+          {selectedSegment ? (
+            <section className="segment-detail" aria-label="選択中の路線詳細">
+              <h2>選択中の路線</h2>
+              <strong>{selectedSegment.name}</strong>
+              <dl>
+                <div>
+                  <dt>開業日</dt>
+                  <dd>{selectedSegment.openedDate ?? `${selectedSegment.openedYear}年`}</dd>
+                </div>
+                <div>
+                  <dt>当時の会社</dt>
+                  <dd>{selectedSegment.companyAtOpening ?? selectedSegment.historicalName}</dd>
+                </div>
+                <div>
+                  <dt>現在の路線イメージ</dt>
+                  <dd>{selectedSegment.currentLineImage ?? selectedSegment.lineName}</dd>
+                </div>
+                {selectedSegment.theme ? (
+                  <div>
+                    <dt>表示テーマ</dt>
+                    <dd>{selectedSegment.theme}</dd>
+                  </div>
+                ) : null}
+                {selectedSegment.notes ? (
+                  <div>
+                    <dt>notes</dt>
+                    <dd>{selectedSegment.notes}</dd>
+                  </div>
+                ) : null}
+                {selectedSegment.sourceStatusLabel ? (
+                  <div>
+                    <dt>データ状態</dt>
+                    <dd>{selectedSegment.sourceStatusLabel}</dd>
+                  </div>
+                ) : null}
+              </dl>
+            </section>
+          ) : null}
           {activeEvent ? (
             <section className="focus-event">
               <h2>直近の節目</h2>
