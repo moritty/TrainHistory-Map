@@ -2,6 +2,7 @@
 
 import type { LayerGroup, Map as LeafletMap } from "leaflet";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { APP_VERSION } from "@/lib/appVersion";
 import { getCurrentSummary, getSegmentStatus, getYearSummary, labelStatus } from "@/lib/railwayStatus";
 import { loadRailwayData } from "@/lib/loadRailwayData";
 import type { RailwayData, RailwaySegment, RailwayStatus, Station } from "@/types/railway";
@@ -295,28 +296,32 @@ export function YamanoteHistoryMap() {
           <p className="eyebrow">TrainHistory-Map</p>
           <h1>山手線が環状線になるまで</h1>
         </div>
-        <div className="status-legend" aria-label="路線状態の凡例">
-          <span>
-            <i className="legend planned" />
-            計画
-          </span>
-          <span>
-            <i className="legend construction" />
-            建設中
-          </span>
-          <span>
-            <i className="legend opened" />
-            開業済み
-          </span>
-          <span>
-            <i className="legend future" />
-            未表示
-          </span>
+        <div className="topbar-meta">
+          <div className="status-legend" aria-label="路線状態の凡例">
+            <span>
+              <i className="legend planned" />
+              計画
+            </span>
+            <span>
+              <i className="legend construction" />
+              建設中
+            </span>
+            <span>
+              <i className="legend opened" />
+              開業済み
+            </span>
+            <span>
+              <i className="legend future" />
+              未表示
+            </span>
+          </div>
+          <span className="app-version">Ver. {APP_VERSION}</span>
         </div>
       </header>
 
       <section className="workspace" aria-label="時系列地図サンプル">
         <section className="map-panel" aria-label="地図">
+          <span className="app-version map-version">Ver. {APP_VERSION}</span>
           <div className="map-toolbar">
             <button className="tool-button" type="button" onClick={() => mapRef.current?.zoomOut()} aria-label="縮小">
               −
