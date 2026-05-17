@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TrainHistory-Map Sample</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">TrainHistory-Map</p>
+          <h1>山手線が環状線になるまで</h1>
+        </div>
+        <div class="status-legend" aria-label="路線状態の凡例">
+          <span><i class="legend planned"></i>計画</span>
+          <span><i class="legend construction"></i>建設中</span>
+          <span><i class="legend opened"></i>開業済み</span>
+          <span><i class="legend future"></i>未表示</span>
+        </div>
+      </header>
+
+      <section class="workspace" aria-label="時系列地図サンプル">
+        <section class="map-panel" aria-label="地図">
+          <div class="map-toolbar">
+            <button class="tool-button" type="button" id="zoomOut" aria-label="縮小">−</button>
+            <button class="tool-button" type="button" id="zoomIn" aria-label="拡大">＋</button>
+          </div>
+          <div id="map" role="img" aria-label="東京周辺の淡色地図と山手線形成史"></div>
+        </section>
+
+        <aside class="side-panel" aria-label="年表と詳細">
+          <div class="year-readout">
+            <span id="selectedYear">1885</span>
+            <small>年時点</small>
+          </div>
+          <section>
+            <h2>この年の見え方</h2>
+            <p id="yearSummary"></p>
+          </section>
+          <section>
+            <h2>表示中の路線</h2>
+            <ul id="segmentList" class="detail-list"></ul>
+          </section>
+          <section>
+            <h2>イベント</h2>
+            <ul id="eventList" class="event-list"></ul>
+          </section>
+        </aside>
+      </section>
+
+      <footer class="timeline">
+        <button id="playButton" class="play-button" type="button">再生</button>
+        <div class="slider-wrap">
+          <input id="yearSlider" type="range" min="1885" max="1925" value="1885" step="5" />
+          <div class="ticks" aria-hidden="true">
+            <span>1885</span>
+            <span>1905</span>
+            <span>1925</span>
+          </div>
+        </div>
+      </footer>
+    </main>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>

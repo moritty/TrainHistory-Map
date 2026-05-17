@@ -1,0 +1,92 @@
+[
+  {
+    "id": "shinagawa",
+    "name": "品川",
+    "openedYear": 1885,
+    "closedYear": null,
+    "lines": ["yamanote-formation"],
+    "position": { "x": 540, "y": 382 },
+    "geo": { "lat": 35.62847, "lng": 139.73876 },
+    "sourceRefs": ["jreast-2025", "kotobank-yamanote"]
+  },
+  {
+    "id": "shibuya",
+    "name": "渋谷",
+    "openedYear": 1885,
+    "closedYear": null,
+    "lines": ["yamanote-formation"],
+    "position": { "x": 220, "y": 374 },
+    "geo": { "lat": 35.65803, "lng": 139.70164 },
+    "sourceRefs": ["jreast-2025"]
+  },
+  {
+    "id": "shinjuku",
+    "name": "新宿",
+    "openedYear": 1885,
+    "closedYear": null,
+    "lines": ["yamanote-formation"],
+    "position": { "x": 222, "y": 232 },
+    "geo": { "lat": 35.69092, "lng": 139.70026 },
+    "sourceRefs": ["jreast-2025", "kotobank-yamanote"]
+  },
+  {
+    "id": "itabashi",
+    "name": "板橋",
+    "openedYear": 1885,
+    "closedYear": null,
+    "lines": ["yamanote-formation"],
+    "position": { "x": 352, "y": 92 },
+    "geo": { "lat": 35.74563, "lng": 139.71975 },
+    "sourceRefs": ["jreast-2025"]
+  },
+  {
+    "id": "akabane",
+    "name": "赤羽",
+    "openedYear": 1885,
+    "closedYear": null,
+    "lines": ["yamanote-formation"],
+    "position": { "x": 445, "y": 42 },
+    "geo": { "lat": 35.77803, "lng": 139.72093 },
+    "sourceRefs": ["jreast-2025", "kotobank-yamanote"]
+  },
+  {
+    "id": "ikebukuro",
+    "name": "池袋",
+    "openedYear": 1903,
+    "closedYear": null,
+    "lines": ["yamanote-formation"],
+    "position": { "x": 354, "y": 128 },
+    "geo": { "lat": 35.7295, "lng": 139.7109 },
+    "sourceRefs": ["jreast-2025", "kotobank-yamanote"]
+  },
+  {
+    "id": "tabata",
+    "name": "田端",
+    "openedYear": 1903,
+    "closedYear": null,
+    "lines": ["yamanote-formation"],
+    "position": { "x": 596, "y": 84 },
+    "geo": { "lat": 35.73806, "lng": 139.76086 },
+    "sourceRefs": ["jreast-2025", "kotobank-yamanote"]
+  },
+  {
+    "id": "ueno",
+    "name": "上野",
+    "openedYear": 1909,
+    "closedYear": null,
+    "lines": ["yamanote-formation"],
+    "position": { "x": 654, "y": 96 },
+    "geo": { "lat": 35.71377, "lng": 139.77725 },
+    "sourceRefs": ["jreast-2025", "japanknowledge-yamanote"]
+  },
+  {
+    "id": "tokyo",
+    "name": "東京",
+    "openedYear": 1914,
+    "closedYear": null,
+    "lines": ["yamanote-formation"],
+    "position": { "x": 624, "y": 205 },
+    "geo": { "lat": 35.68124, "lng": 139.76713 },
+    "sourceRefs": ["jreast-2025"]
+  }
+]

@@ -1,0 +1,13 @@
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.log
+node_modules/
+.next/
+*.tsbuildinfo
+dist/
+build/
+.DS_Store

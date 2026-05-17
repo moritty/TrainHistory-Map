@@ -1,0 +1,162 @@
+[
+  {
+    "id": "tokaido-main-opening",
+    "year": 1872,
+    "title": "新橋〜横浜間が開業",
+    "body": "日本の鉄道史の起点として、新橋〜横浜間の官設鉄道が開業します。MVPでは東海道線の関東側形成の起点として表示します。",
+    "category": "railway_opening",
+    "relatedSegmentIds": ["jr-tokaido-kanto"],
+    "relatedStationIds": ["shinagawa"],
+    "sourceRefs": ["needs-verification"]
+  },
+  {
+    "id": "takasaki-line-opening",
+    "year": 1883,
+    "title": "高崎線方面が開業",
+    "body": "日本鉄道により上野から北西方向へ向かう幹線が形成され、熊谷・高崎方面への鉄道網が広がります。",
+    "category": "railway_opening",
+    "relatedSegmentIds": ["jr-takasaki-line"],
+    "relatedStationIds": ["ueno"],
+    "sourceRefs": ["needs-verification"]
+  },
+  {
+    "id": "utsunomiya-line-opening",
+    "year": 1885,
+    "title": "東北方面の幹線が伸びる",
+    "body": "日本鉄道により上野から大宮・宇都宮方面へ向かう幹線が整備され、関東北部への鉄道軸が強まります。",
+    "category": "railway_opening",
+    "relatedSegmentIds": ["jr-utsunomiya-line"],
+    "relatedStationIds": ["ueno"],
+    "sourceRefs": ["needs-verification"]
+  },
+  {
+    "id": "shinagawa-line-open",
+    "year": 1885,
+    "title": "日本鉄道品川線が開業",
+    "body": "品川〜渋谷〜新宿〜板橋〜赤羽方面の非環状ルートから、山手線形成史を見始めます。西側に伸びる「し」の字の原型です。",
+    "category": "railway_opening",
+    "relatedSegmentIds": ["shinagawa-shibuya", "shibuya-shinjuku", "shinjuku-itabashi-akabane"],
+    "relatedStationIds": ["shinagawa", "shibuya", "shinjuku", "itabashi", "akabane"],
+    "sourceRefs": ["jreast-2025", "kotobank-yamanote"]
+  },
+  {
+    "id": "chuo-line-opening",
+    "year": 1889,
+    "title": "中央線方面が開業",
+    "body": "甲武鉄道を起点に、新宿から西へ向かう鉄道軸が形成されていきます。MVPでは中央線の関東側形成として概略表示します。",
+    "category": "railway_opening",
+    "relatedSegmentIds": ["jr-chuo-line-kanto"],
+    "relatedStationIds": ["shinjuku"],
+    "sourceRefs": ["needs-verification"]
+  },
+  {
+    "id": "yokosuka-line-opening",
+    "year": 1889,
+    "title": "横須賀線方面が開業",
+    "body": "大船から横須賀方面への鉄道が開業し、東京湾南西部への鉄道軸が形成されます。",
+    "category": "railway_opening",
+    "relatedSegmentIds": ["jr-yokosuka-line"],
+    "relatedStationIds": [],
+    "sourceRefs": ["needs-verification"]
+  },
+  {
+    "id": "sobu-line-opening",
+    "year": 1894,
+    "title": "総武線方面が開業",
+    "body": "総武鉄道により千葉方面への路線が形成され、東京東部から千葉県方面への鉄道網が広がります。",
+    "category": "railway_opening",
+    "relatedSegmentIds": ["jr-sobu-line"],
+    "relatedStationIds": [],
+    "sourceRefs": ["needs-verification"]
+  },
+  {
+    "id": "joban-line-opening",
+    "year": 1896,
+    "title": "常磐線方面がつながる",
+    "body": "常磐線方面の幹線が整い、東京北東部から茨城方面へ向かう鉄道軸が見えてきます。",
+    "category": "railway_opening",
+    "relatedSegmentIds": ["jr-joban-line"],
+    "relatedStationIds": ["ueno", "tabata"],
+    "sourceRefs": ["needs-verification"]
+  },
+  {
+    "id": "toshima-line-open",
+    "year": 1903,
+    "title": "豊島線が開業",
+    "body": "池袋〜田端間が開業し、山手線の北側の輪郭が見え始めます。",
+    "category": "railway_opening",
+    "relatedSegmentIds": ["ikebukuro-tabata"],
+    "relatedStationIds": ["ikebukuro", "tabata"],
+    "sourceRefs": ["jreast-2025", "kotobank-yamanote"]
+  },
+  {
+    "id": "yamanote-line-integrated",
+    "year": 1909,
+    "title": "山手線として統合",
+    "body": "品川線と豊島線が山手線として扱われ、電車運転も始まります。",
+    "category": "line_naming",
+    "relatedSegmentIds": ["shinagawa-shibuya", "shibuya-shinjuku", "shinjuku-itabashi-akabane", "ikebukuro-tabata", "tabata-ueno"],
+    "relatedStationIds": ["ueno"],
+    "sourceRefs": ["jreast-2025", "japanknowledge-yamanote"]
+  },
+  {
+    "id": "tokyo-station-open",
+    "year": 1914,
+    "title": "東京駅が開業",
+    "body": "都心側の鉄道結節点が整い、環状化へ向かう文脈が見えやすくなります。",
+    "category": "station_opening",
+    "relatedSegmentIds": ["shinagawa-tokyo"],
+    "relatedStationIds": ["tokyo"],
+    "sourceRefs": ["jreast-2025"]
+  },
+  {
+    "id": "keihin-tohoku-line-start",
+    "year": 1914,
+    "title": "京浜線の電車運転が始まる",
+    "body": "東京〜横浜間を中心に電車運転が始まり、のちの京浜東北線につながる都市圏通勤軸が形成されます。",
+    "category": "operation_pattern",
+    "relatedSegmentIds": ["jr-keihin-tohoku-line"],
+    "relatedStationIds": ["tokyo", "shinagawa"],
+    "sourceRefs": ["needs-verification"]
+  },
+  {
+    "id": "no-shaped-operation",
+    "year": 1919,
+    "title": "「の」の字運転へ",
+    "body": "中央本線が東京駅まで延伸し、新宿・東京・品川・池袋・上野方面を結ぶ「の」の字の運転形態が見えてきます。",
+    "category": "operation_pattern",
+    "relatedSegmentIds": ["central-line-to-tokyo"],
+    "relatedStationIds": ["shinjuku", "tokyo"],
+    "sourceRefs": ["jreast-2025"]
+  },
+  {
+    "id": "loop-operation-start",
+    "year": 1925,
+    "title": "環状運転の開始",
+    "body": "東京〜上野方面がつながり、現在の山手線に近い環状運転が始まります。",
+    "category": "operation_pattern",
+    "relatedSegmentIds": ["tokyo-ueno"],
+    "relatedStationIds": ["tokyo", "ueno"],
+    "sourceRefs": ["jreast-2025", "kotobank-yamanote", "japanknowledge-yamanote"]
+  },
+  {
+    "id": "saikyo-line-start",
+    "year": 1985,
+    "title": "埼京線が開業",
+    "body": "大宮・赤羽・池袋・新宿方面を結ぶ通勤路線として埼京線が開業し、山手線西側と埼玉方面の結びつきが強まります。",
+    "category": "railway_opening",
+    "relatedSegmentIds": ["jr-saikyo-line"],
+    "relatedStationIds": ["shinjuku", "ikebukuro", "akabane"],
+    "sourceRefs": ["needs-verification"]
+  },
+  {
+    "id": "keiyo-line-tokyo-start",
+    "year": 1990,
+    "title": "京葉線が東京駅へ乗り入れる",
+    "body": "東京湾岸部を通る京葉線が東京駅へ乗り入れ、湾岸エリアの鉄道軸が強くなります。",
+    "category": "railway_opening",
+    "relatedSegmentIds": ["jr-keiyo-line"],
+    "relatedStationIds": ["tokyo"],
+    "sourceRefs": ["needs-verification"]
+  }
+]
