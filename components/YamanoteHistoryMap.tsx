@@ -4,6 +4,7 @@ import type { LayerGroup, Map as LeafletMap } from "leaflet";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { APP_VERSION } from "@/lib/appVersion";
 import { getCurrentSummary, getSegmentStatus, getYearSummary, labelStatus } from "@/lib/railwayStatus";
+import { getRouteGeometry } from "@/lib/routeGeometry";
 import { loadRailwayData } from "@/lib/loadRailwayData";
 import type { RailwayData, RailwaySegment, RailwayStatus, Station } from "@/types/railway";
 
@@ -19,6 +20,12 @@ const PLAYBACK_SPEEDS = [
   { label: "標準", interval: 1000 },
   { label: "速い", interval: 600 },
 ] as const;
+const DISPLAY_MODES = [
+  { id: "all", label: "全部" },
+  { id: "yamanote", label: "山手" },
+  { id: "jr", label: "JR" },
+  { id: "private", label: "私鉄" },
+] as const;
 
 const EMPTY_DATA: RailwayData = {
   segments: [],
@@ -33,6 +40,7 @@ type RouteStyle = {
   dashArray?: string;
   opacity: number;
 };
+type DisplayMode = (typeof DISPLAY_MODES)[number]["id"];
 
 function routeStyle(status: RailwayStatus): RouteStyle {
   const styles: Record<RailwayStatus, RouteStyle> = {
@@ -45,23 +53,28 @@ function routeStyle(status: RailwayStatus): RouteStyle {
   return styles[status];
 }
 
-function segmentStyle(segment: RailwaySegment, status: RailwayStatus): RouteStyle {
+function segmentStyle(segment: RailwaySegment, status: RailwayStatus, isSelected: boolean, hasSelection: boolean): RouteStyle {
   const style = routeStyle(status);
 
-  if (status !== "opened" || !segment.displayColor) {
-    return style;
-  }
+  const routeStyleWithColor =
+    status === "opened" && segment.displayColor
+      ? {
+          ...style,
+          color: segment.displayColor,
+          weight: segment.lineId === "yamanote-formation" ? 8 : 5,
+          opacity: segment.lineId === "yamanote-formation" ? 0.98 : 0.78,
+        }
+      : style;
 
   return {
-    ...style,
-    color: segment.displayColor,
-    weight: segment.lineId === "yamanote-formation" ? 8 : 5,
-    opacity: segment.lineId === "yamanote-formation" ? 0.98 : 0.72,
+    ...routeStyleWithColor,
+    weight: isSelected ? routeStyleWithColor.weight + 3 : routeStyleWithColor.weight,
+    opacity: hasSelection && !isSelected ? Math.min(routeStyleWithColor.opacity, 0.26) : routeStyleWithColor.opacity,
   };
 }
 
 function toLatLngs(segment: RailwaySegment): [number, number][] {
-  return segment.geoLine.map((point) => [point.lat, point.lng]);
+  return getRouteGeometry(segment.id, segment.geoLine).map((point) => [point.lat, point.lng]);
 }
 
 function stationLatLng(station: Station): [number, number] {
@@ -74,11 +87,19 @@ function changeYearByStep(current: number, direction: -1 | 1): number {
   return YEARS[nextIndex];
 }
 
+function matchesDisplayMode(segment: RailwaySegment, mode: DisplayMode): boolean {
+  if (mode === "all") return true;
+  if (mode === "private") return segment.category === "private_railway";
+  if (mode === "jr") return segment.category === "jr_major_kanto";
+  return segment.lineId === "yamanote-formation" || segment.id === "central-line-to-tokyo";
+}
+
 export function YamanoteHistoryMap() {
   const [data, setData] = useState<RailwayData>(EMPTY_DATA);
   const [selectedYear, setSelectedYear] = useState(1885);
   const [summaryOverride, setSummaryOverride] = useState<string | null>(null);
   const [selectedSegment, setSelectedSegment] = useState<RailwaySegment | null>(null);
+  const [displayMode, setDisplayMode] = useState<DisplayMode>("all");
   const [isPlaying, setIsPlaying] = useState(false);
   const [playbackInterval, setPlaybackInterval] = useState<(typeof PLAYBACK_SPEEDS)[number]["interval"]>(1000);
   const [isMapReady, setIsMapReady] = useState(false);
@@ -91,13 +112,21 @@ export function YamanoteHistoryMap() {
   const timerRef = useRef<number | null>(null);
 
   const visibleSegments = useMemo(
-    () => data.segments.filter((segment) => getSegmentStatus(segment, selectedYear) !== "future"),
-    [data.segments, selectedYear],
+    () =>
+      data.segments.filter(
+        (segment) => matchesDisplayMode(segment, displayMode) && getSegmentStatus(segment, selectedYear) !== "future",
+      ),
+    [data.segments, displayMode, selectedYear],
   );
 
   const visibleEvents = useMemo(
-    () => data.events.filter((event) => event.year <= selectedYear),
-    [data.events, selectedYear],
+    () =>
+      data.events.filter((event) => {
+        if (event.year > selectedYear) return false;
+        if (displayMode === "all") return true;
+        return event.relatedSegmentIds.some((segmentId) => data.segments.some((segment) => segment.id === segmentId && matchesDisplayMode(segment, displayMode)));
+      }),
+    [data.events, data.segments, displayMode, selectedYear],
   );
 
   const currentSummary = useMemo(() => getCurrentSummary(data.summaries, selectedYear), [data.summaries, selectedYear]);
@@ -196,16 +225,18 @@ export function YamanoteHistoryMap() {
     railwayLayer.clearLayers();
     stationLayer.clearLayers();
 
-    data.segments.forEach((segment) => {
+    visibleSegments.forEach((segment) => {
       const status = getSegmentStatus(segment, selectedYear);
       if (status === "future") return;
 
-      const style = segmentStyle(segment, status);
+      const isSelected = selectedSegment?.id === segment.id;
+      const hasSelection = selectedSegment !== null;
+      const style = segmentStyle(segment, status, isSelected, hasSelection);
       leaflet
         .polyline(toLatLngs(segment), {
           color: "#ffffff",
-          weight: style.weight + 5,
-          opacity: Math.min(style.opacity + 0.08, 1),
+          weight: style.weight + (isSelected ? 7 : 5),
+          opacity: hasSelection && !isSelected ? 0.24 : Math.min(style.opacity + 0.1, 1),
           lineCap: "round",
           lineJoin: "round",
           interactive: false,
@@ -252,12 +283,12 @@ export function YamanoteHistoryMap() {
         });
         marker.bindPopup(`<strong>${station.name}</strong><br>${station.openedYear}年表示開始`);
       });
-  }, [data.segments, data.stations, isMapReady, selectedYear]);
+  }, [data.stations, isMapReady, selectedSegment, selectedYear, visibleSegments]);
 
   useEffect(() => {
     setSummaryOverride(null);
     setSelectedSegment(null);
-  }, [selectedYear]);
+  }, [displayMode, selectedYear]);
 
   useEffect(() => {
     if (!isPlaying) {
@@ -322,6 +353,18 @@ export function YamanoteHistoryMap() {
       <section className="workspace" aria-label="時系列地図サンプル">
         <section className="map-panel" aria-label="地図">
           <span className="app-version map-version">Ver. {APP_VERSION}</span>
+          <div className="mode-controls" aria-label="表示モード">
+            {DISPLAY_MODES.map((mode) => (
+              <button
+                key={mode.id}
+                className={mode.id === displayMode ? "active" : ""}
+                type="button"
+                onClick={() => setDisplayMode(mode.id)}
+              >
+                {mode.label}
+              </button>
+            ))}
+          </div>
           <div className="map-toolbar">
             <button className="tool-button" type="button" onClick={() => mapRef.current?.zoomOut()} aria-label="縮小">
               −
@@ -416,8 +459,13 @@ export function YamanoteHistoryMap() {
             <ul className="detail-list">
               {visibleSegments.map((segment) => {
                 const status = getSegmentStatus(segment, selectedYear);
+                const isSelected = selectedSegment?.id === segment.id;
                 return (
-                  <li key={segment.id} style={{ borderColor: segmentStyle(segment, status).color }}>
+                  <li
+                    key={segment.id}
+                    className={isSelected ? "selected" : ""}
+                    style={{ borderColor: segmentStyle(segment, status, isSelected, selectedSegment !== null).color }}
+                  >
                     <strong>{segment.name}</strong>
                     {segment.openedYear}年開業 / {labelStatus(status)}
                   </li>

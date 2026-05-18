@@ -189,6 +189,38 @@ h2 {
   gap: 8px;
 }
 
+.mode-controls {
+  position: absolute;
+  z-index: 500;
+  top: 16px;
+  left: 64px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 4px;
+  border: 1px solid rgba(217, 221, 214, 0.92);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.1);
+}
+
+.mode-controls button {
+  min-width: 52px;
+  height: 30px;
+  border: 0;
+  border-radius: 6px;
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.mode-controls button.active {
+  color: #0f4f48;
+  background: #dcefeb;
+}
+
 .map-loading {
   position: absolute;
   inset: 0;
@@ -433,6 +465,10 @@ h2 {
 
 .event-list li.current {
   border-left-color: var(--accent);
+}
+
+.detail-list li.selected {
+  background: #eef8f5;
 }
 
 .detail-list strong,
@@ -748,6 +784,22 @@ input[type="range"]::-moz-range-thumb {
   .map-toolbar {
     top: 10px;
     left: 10px;
+  }
+
+  .mode-controls {
+    top: 52px;
+    right: 10px;
+    left: 10px;
+    justify-content: space-between;
+    gap: 4px;
+    padding: 3px;
+  }
+
+  .mode-controls button {
+    min-width: 0;
+    flex: 1;
+    height: 28px;
+    font-size: 11px;
   }
 
   .map-version {

@@ -1,5 +1,19 @@
 import type { PrivateRailwayOpening, RailwayData, RailwaySegment } from "@/types/railway";
 
+const PRIVATE_COMPANY_COLORS: Record<string, string> = {
+  東武鉄道: "#f68b1f",
+  京浜電気鉄道: "#00a3e0",
+  玉川電気鉄道: "#7a4bb3",
+  京成電気軌道: "#005aaa",
+  京王電気軌道: "#dd0077",
+  東上鉄道: "#0f8f5f",
+  武蔵野鉄道: "#2b55a2",
+  池上電気鉄道: "#d6508f",
+  目黒蒲田電鉄: "#e45c2b",
+  玉南電気鉄道: "#8a5a15",
+  西武鉄道: "#00a6b2",
+};
+
 async function loadJson<T>(path: string): Promise<T> {
   const response = await fetch(path);
 
@@ -38,7 +52,7 @@ function toRailwaySegment(opening: PrivateRailwayOpening): RailwaySegment {
     name: opening.name,
     description: `${opening.theme}。${opening.notes}`,
     category: opening.category,
-    displayColor: isClosed ? "#6b7280" : "#22c55e",
+    displayColor: isClosed ? "#6b7280" : (PRIVATE_COMPANY_COLORS[opening.companyAtOpening] ?? opening.displayColor),
     plannedYear: Math.max(1900, opening.openedYear - 2),
     constructionStartYear: Math.max(1900, opening.openedYear - 1),
     openedYear: opening.openedYear,
