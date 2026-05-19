@@ -221,6 +221,45 @@ h2 {
   background: #dcefeb;
 }
 
+.focus-controls {
+  position: absolute;
+  z-index: 500;
+  top: 58px;
+  left: 64px;
+  display: flex;
+  gap: 8px;
+  max-width: min(620px, calc(100% - 88px));
+  padding: 6px;
+  border: 1px solid rgba(217, 221, 214, 0.92);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.1);
+}
+
+.focus-controls label {
+  display: grid;
+  gap: 3px;
+  min-width: 154px;
+}
+
+.focus-controls span {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.focus-controls select {
+  width: 100%;
+  min-height: 32px;
+  border: 1px solid #d8ddd2;
+  border-radius: 6px;
+  color: var(--text);
+  background: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .map-loading {
   position: absolute;
   inset: 0;
@@ -799,6 +838,25 @@ input[type="range"]::-moz-range-thumb {
     min-width: 0;
     flex: 1;
     height: 28px;
+    font-size: 11px;
+  }
+
+  .focus-controls {
+    top: 88px;
+    right: 10px;
+    left: 10px;
+    max-width: none;
+    gap: 5px;
+    padding: 5px;
+  }
+
+  .focus-controls label {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .focus-controls select {
+    min-height: 30px;
     font-size: 11px;
   }
 

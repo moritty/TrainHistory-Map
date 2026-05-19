@@ -26,6 +26,15 @@ const DISPLAY_MODES = [
   { id: "jr", label: "JR" },
   { id: "private", label: "私鉄" },
 ] as const;
+const PRIVATE_COMPANY_FILTERS = [
+  { id: "all", label: "すべて" },
+  { id: "seibu", label: "西武" },
+  { id: "keio", label: "京王" },
+  { id: "tokyu", label: "東急" },
+  { id: "tobu", label: "東武" },
+  { id: "keisei", label: "京成" },
+  { id: "keikyu", label: "京急" },
+] as const;
 
 const EMPTY_DATA: RailwayData = {
   segments: [],
@@ -41,6 +50,7 @@ type RouteStyle = {
   opacity: number;
 };
 type DisplayMode = (typeof DISPLAY_MODES)[number]["id"];
+type PrivateCompanyFilter = (typeof PRIVATE_COMPANY_FILTERS)[number]["id"];
 
 function routeStyle(status: RailwayStatus): RouteStyle {
   const styles: Record<RailwayStatus, RouteStyle> = {
@@ -94,12 +104,31 @@ function matchesDisplayMode(segment: RailwaySegment, mode: DisplayMode): boolean
   return segment.lineId === "yamanote-formation" || segment.id === "central-line-to-tokyo";
 }
 
+function privateCompanyGroup(segment: RailwaySegment): PrivateCompanyFilter {
+  const text = `${segment.companyAtOpening ?? ""} ${segment.currentOperator ?? ""} ${segment.currentLineImage ?? ""}`;
+  if (text.includes("西武") || text.includes("武蔵野鉄道")) return "seibu";
+  if (text.includes("京王") || text.includes("玉南")) return "keio";
+  if (text.includes("東急") || text.includes("玉川電気鉄道") || text.includes("池上電気鉄道") || text.includes("目黒蒲田電鉄")) return "tokyu";
+  if (text.includes("東武") || text.includes("東上鉄道")) return "tobu";
+  if (text.includes("京成")) return "keisei";
+  if (text.includes("京急") || text.includes("京浜電気鉄道")) return "keikyu";
+  return "all";
+}
+
+function matchesPrivateFilters(segment: RailwaySegment, companyFilter: PrivateCompanyFilter, routeFilter: string): boolean {
+  if (segment.category !== "private_railway") return true;
+  if (companyFilter !== "all" && privateCompanyGroup(segment) !== companyFilter) return false;
+  return routeFilter === "all" || segment.currentLineImage === routeFilter;
+}
+
 export function YamanoteHistoryMap() {
   const [data, setData] = useState<RailwayData>(EMPTY_DATA);
   const [selectedYear, setSelectedYear] = useState(1885);
   const [summaryOverride, setSummaryOverride] = useState<string | null>(null);
   const [selectedSegment, setSelectedSegment] = useState<RailwaySegment | null>(null);
   const [displayMode, setDisplayMode] = useState<DisplayMode>("all");
+  const [privateCompanyFilter, setPrivateCompanyFilter] = useState<PrivateCompanyFilter>("all");
+  const [privateRouteFilter, setPrivateRouteFilter] = useState("all");
   const [isPlaying, setIsPlaying] = useState(false);
   const [playbackInterval, setPlaybackInterval] = useState<(typeof PLAYBACK_SPEEDS)[number]["interval"]>(1000);
   const [isMapReady, setIsMapReady] = useState(false);
@@ -114,28 +143,47 @@ export function YamanoteHistoryMap() {
   const visibleSegments = useMemo(
     () =>
       data.segments.filter(
-        (segment) => matchesDisplayMode(segment, displayMode) && getSegmentStatus(segment, selectedYear) !== "future",
+        (segment) =>
+          matchesDisplayMode(segment, displayMode) &&
+          matchesPrivateFilters(segment, privateCompanyFilter, privateRouteFilter) &&
+          getSegmentStatus(segment, selectedYear) !== "future",
       ),
-    [data.segments, displayMode, selectedYear],
+    [data.segments, displayMode, privateCompanyFilter, privateRouteFilter, selectedYear],
   );
+
+  const privateRouteOptions = useMemo(() => {
+    const routeNames = data.segments
+      .filter((segment) => segment.category === "private_railway")
+      .filter((segment) => matchesPrivateFilters(segment, privateCompanyFilter, "all"))
+      .map((segment) => segment.currentLineImage)
+      .filter((lineName): lineName is string => Boolean(lineName));
+
+    return Array.from(new Set(routeNames)).sort((a, b) => a.localeCompare(b, "ja"));
+  }, [data.segments, privateCompanyFilter]);
 
   const visibleEvents = useMemo(
     () =>
       data.events.filter((event) => {
         if (event.year > selectedYear) return false;
-        if (displayMode === "all") return true;
-        return event.relatedSegmentIds.some((segmentId) => data.segments.some((segment) => segment.id === segmentId && matchesDisplayMode(segment, displayMode)));
+        if (displayMode === "all" && privateCompanyFilter === "all" && privateRouteFilter === "all") return true;
+        return event.relatedSegmentIds.some((segmentId) =>
+          data.segments.some(
+            (segment) =>
+              segment.id === segmentId &&
+              matchesDisplayMode(segment, displayMode) &&
+              matchesPrivateFilters(segment, privateCompanyFilter, privateRouteFilter),
+          ),
+        );
       }),
-    [data.events, data.segments, displayMode, selectedYear],
+    [data.events, data.segments, displayMode, privateCompanyFilter, privateRouteFilter, selectedYear],
   );
 
   const currentSummary = useMemo(() => getCurrentSummary(data.summaries, selectedYear), [data.summaries, selectedYear]);
   const activeEvent = useMemo(
     () =>
-      data.events
-        .filter((event) => event.year <= selectedYear)
+      visibleEvents
         .reduce<(typeof data.events)[number] | null>((current, event) => (!current || event.year > current.year ? event : current), null),
-    [data.events, selectedYear],
+    [visibleEvents],
   );
   const progressPercent = ((selectedYear - START_YEAR) / (END_YEAR - START_YEAR)) * 100;
   const yearSummary = summaryOverride ?? getYearSummary(data.summaries, selectedYear);
@@ -288,7 +336,29 @@ export function YamanoteHistoryMap() {
   useEffect(() => {
     setSummaryOverride(null);
     setSelectedSegment(null);
-  }, [displayMode, selectedYear]);
+  }, [displayMode, privateCompanyFilter, privateRouteFilter, selectedYear]);
+
+  useEffect(() => {
+    if (privateRouteFilter !== "all" && !privateRouteOptions.includes(privateRouteFilter)) {
+      setPrivateRouteFilter("all");
+    }
+  }, [privateRouteFilter, privateRouteOptions]);
+
+  useEffect(() => {
+    const leaflet = leafletRef.current;
+    const map = mapRef.current;
+    if (!leaflet || !map || !isMapReady) return;
+    if (displayMode === "all" && privateCompanyFilter === "all" && privateRouteFilter === "all") return;
+
+    const targetSegments = data.segments.filter(
+      (segment) => matchesDisplayMode(segment, displayMode) && matchesPrivateFilters(segment, privateCompanyFilter, privateRouteFilter),
+    );
+    const routePoints = targetSegments.flatMap((segment) => toLatLngs(segment));
+    if (routePoints.length === 0) return;
+
+    map.fitBounds(leaflet.latLngBounds(routePoints), { padding: [36, 36], maxZoom: 11 });
+    window.setTimeout(() => map.invalidateSize(), 0);
+  }, [data.segments, displayMode, isMapReady, privateCompanyFilter, privateRouteFilter]);
 
   useEffect(() => {
     if (!isPlaying) {
@@ -359,11 +429,53 @@ export function YamanoteHistoryMap() {
                 key={mode.id}
                 className={mode.id === displayMode ? "active" : ""}
                 type="button"
-                onClick={() => setDisplayMode(mode.id)}
+                onClick={() => {
+                  setDisplayMode(mode.id);
+                  if (mode.id !== "private") {
+                    setPrivateCompanyFilter("all");
+                    setPrivateRouteFilter("all");
+                  }
+                }}
               >
                 {mode.label}
               </button>
             ))}
+          </div>
+          <div className="focus-controls" aria-label="私鉄フォーカス">
+            <label>
+              <span>会社</span>
+              <select
+                value={privateCompanyFilter}
+                onChange={(event) => {
+                  setDisplayMode("private");
+                  setPrivateCompanyFilter(event.target.value as PrivateCompanyFilter);
+                  setPrivateRouteFilter("all");
+                }}
+              >
+                {PRIVATE_COMPANY_FILTERS.map((company) => (
+                  <option key={company.id} value={company.id}>
+                    {company.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              <span>路線</span>
+              <select
+                value={privateRouteFilter}
+                onChange={(event) => {
+                  setDisplayMode("private");
+                  setPrivateRouteFilter(event.target.value);
+                }}
+              >
+                <option value="all">すべて</option>
+                {privateRouteOptions.map((routeName) => (
+                  <option key={routeName} value={routeName}>
+                    {routeName}
+                  </option>
+                ))}
+              </select>
+            </label>
           </div>
           <div className="map-toolbar">
             <button className="tool-button" type="button" onClick={() => mapRef.current?.zoomOut()} aria-label="縮小">
