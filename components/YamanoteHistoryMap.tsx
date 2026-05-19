@@ -35,6 +35,36 @@ const PRIVATE_COMPANY_FILTERS = [
   { id: "keisei", label: "京成" },
   { id: "keikyu", label: "京急" },
 ] as const;
+const PRIVATE_FOCUS_SUMMARIES: Record<PrivateCompanyFilter, { title: string; body: string }> = {
+  all: {
+    title: "私鉄全体",
+    body: "東京の私鉄は、都心側の端点から郊外へ放射状に伸び、沿線開発や住宅地形成と結びつきながら広がっていきます。",
+  },
+  seibu: {
+    title: "西武フォーカス",
+    body: "池袋から飯能方面へ伸びる武蔵野鉄道系と、高田馬場から東村山方面へ伸びる西武新宿線系の2軸で、西北部の郊外化を支えます。",
+  },
+  keio: {
+    title: "京王フォーカス",
+    body: "笹塚・新宿から調布、府中、八王子方面へ伸びる西東京の私鉄軸です。都心西側と多摩方面の結びつきが見えます。",
+  },
+  tokyu: {
+    title: "東急フォーカス",
+    body: "玉電、池上、目蒲、東横系が南西部から神奈川方面へ広がります。住宅地開発と都市圏拡大の関係が見えやすい会社です。",
+  },
+  tobu: {
+    title: "東武フォーカス",
+    body: "下町から北千住方面へ入る伊勢崎線系と、池袋から川越方面へ向かう東上線系で、東京北部・北西部への軸を作ります。",
+  },
+  keisei: {
+    title: "京成フォーカス",
+    body: "押上から葛飾・千葉方面へ伸びる東東京の私鉄軸です。柴又・金町方面の支線形成も同時に見られます。",
+  },
+  keikyu: {
+    title: "京急フォーカス",
+    body: "川崎・横浜方面から品川側へ入る南方向の軸です。東京南部と京浜間のつながりを先に見る入口になります。",
+  },
+};
 
 const EMPTY_DATA: RailwayData = {
   segments: [],
@@ -121,6 +151,14 @@ function matchesPrivateFilters(segment: RailwaySegment, companyFilter: PrivateCo
   return routeFilter === "all" || segment.currentLineImage === routeFilter;
 }
 
+function firstOpeningYear(segments: RailwaySegment[], companyFilter: PrivateCompanyFilter, routeFilter: string): number | null {
+  const years = segments
+    .filter((segment) => segment.category === "private_railway")
+    .filter((segment) => matchesPrivateFilters(segment, companyFilter, routeFilter))
+    .map((segment) => segment.openedYear);
+  return years.length > 0 ? Math.min(...years) : null;
+}
+
 export function YamanoteHistoryMap() {
   const [data, setData] = useState<RailwayData>(EMPTY_DATA);
   const [selectedYear, setSelectedYear] = useState(1885);
@@ -160,6 +198,23 @@ export function YamanoteHistoryMap() {
 
     return Array.from(new Set(routeNames)).sort((a, b) => a.localeCompare(b, "ja"));
   }, [data.segments, privateCompanyFilter]);
+
+  const focusSegments = useMemo(
+    () =>
+      data.segments
+        .filter((segment) => segment.category === "private_railway")
+        .filter((segment) => matchesPrivateFilters(segment, privateCompanyFilter, privateRouteFilter))
+        .sort((a, b) => a.openedYear - b.openedYear || (a.openedDate ?? "").localeCompare(b.openedDate ?? "")),
+    [data.segments, privateCompanyFilter, privateRouteFilter],
+  );
+  const shouldShowPrivateFocus = displayMode === "private" || privateCompanyFilter !== "all" || privateRouteFilter !== "all";
+  const privateFocusSummary = PRIVATE_FOCUS_SUMMARIES[privateCompanyFilter];
+  const privateFocusTitle =
+    privateRouteFilter !== "all" ? `${privateRouteFilter}フォーカス` : privateFocusSummary.title;
+  const privateFocusBody =
+    privateRouteFilter !== "all"
+      ? `${privateRouteFilter}に関係する開業区間だけを表示しています。スライダーを動かすと、その路線の形成順を追えます。`
+      : privateFocusSummary.body;
 
   const visibleEvents = useMemo(
     () =>
@@ -447,9 +502,15 @@ export function YamanoteHistoryMap() {
               <select
                 value={privateCompanyFilter}
                 onChange={(event) => {
+                  const nextCompany = event.target.value as PrivateCompanyFilter;
+                  const firstYear = firstOpeningYear(data.segments, nextCompany, "all");
                   setDisplayMode("private");
-                  setPrivateCompanyFilter(event.target.value as PrivateCompanyFilter);
+                  setPrivateCompanyFilter(nextCompany);
                   setPrivateRouteFilter("all");
+                  if (firstYear !== null) {
+                    setIsPlaying(false);
+                    setSelectedYear(firstYear);
+                  }
                 }}
               >
                 {PRIVATE_COMPANY_FILTERS.map((company) => (
@@ -464,8 +525,14 @@ export function YamanoteHistoryMap() {
               <select
                 value={privateRouteFilter}
                 onChange={(event) => {
+                  const nextRoute = event.target.value;
+                  const firstYear = firstOpeningYear(data.segments, privateCompanyFilter, nextRoute);
                   setDisplayMode("private");
-                  setPrivateRouteFilter(event.target.value);
+                  setPrivateRouteFilter(nextRoute);
+                  if (firstYear !== null) {
+                    setIsPlaying(false);
+                    setSelectedYear(firstYear);
+                  }
                 }}
               >
                 <option value="all">すべて</option>
@@ -513,6 +580,21 @@ export function YamanoteHistoryMap() {
             <h2>この年の見え方</h2>
             <p>{errorMessage ?? yearSummary}</p>
           </section>
+          {shouldShowPrivateFocus ? (
+            <section className="focus-story" aria-label="フォーカス解説">
+              <h2>{privateFocusTitle}</h2>
+              <p>{privateFocusBody}</p>
+              <ol className="focus-timeline" aria-label="フォーカス中の開業順">
+                {focusSegments.map((segment) => (
+                  <li key={segment.id} className={selectedYear >= segment.openedYear ? "active" : ""}>
+                    <time>{segment.openedDate ?? `${segment.openedYear}年`}</time>
+                    <span>{segment.name}</span>
+                    <small>{segment.currentLineImage ?? segment.lineName}</small>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          ) : null}
           {selectedSegment ? (
             <section className="segment-detail" aria-label="選択中の路線詳細">
               <h2>選択中の路線</h2>

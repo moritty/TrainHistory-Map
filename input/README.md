@@ -5,7 +5,7 @@
 ## ファイル
 
 - `tokyo_private_railway_openings.md`
-  - 企画・対象範囲・開業順21件・実装補足
+  - 企画・対象範囲・開業順22件・実装補足
 - `railway_openings.json`
   - アプリに読み込ませる初期データ
 - `codex_prompt.md`

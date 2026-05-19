@@ -34,4 +34,4 @@ Next.js + TypeScript + Tailwind CSS + MapLibre GL JS で、東京都内の私鉄
 
 ## まず作るもの
 
-同梱の `railway_openings.json` 21件のデータを読み込み、年を動かすと路線の表示数が増えていくプロトタイプを作ってください。
+同梱の `railway_openings.json` 22件のデータを読み込み、年を動かすと路線の表示数が増えていくプロトタイプを作ってください。

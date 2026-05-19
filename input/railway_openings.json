@@ -604,8 +604,70 @@
     ]
   },
   {
-    "id": "tokyo-private-1927-21",
+    "id": "tokyo-private-1926-21",
     "order": 21,
+    "openedDate": "1926-02-14",
+    "openedYear": 1926,
+    "name": "丸子多摩川〜神奈川",
+    "companyAtOpening": "東京横浜電鉄",
+    "currentOperator": "東急電鉄",
+    "currentLineImage": "東急東横線",
+    "area": "多摩川・武蔵小杉・日吉・綱島・菊名・神奈川",
+    "theme": "東急東横線が神奈川方面へ伸びる",
+    "status": "opened",
+    "category": "private_railway",
+    "systemType": "electric_railway",
+    "displayColor": "#22c55e",
+    "needsVerification": false,
+    "sourceStatus": "tokyu-official-history",
+    "notes": "東急電鉄公式の東横線史で、1926年2月14日に丸子多摩川〜神奈川間が開通したことを確認。東京側中心だった東急系表示を神奈川方面へ拡張する区間。",
+    "geojsonFile": "geojson/tokyo_private_1926_21.geojson",
+    "approxCoordinates": [
+      [
+        139.6688,
+        35.589
+      ],
+      [
+        139.6617,
+        35.5806
+      ],
+      [
+        139.6545,
+        35.5659
+      ],
+      [
+        139.6466,
+        35.5536
+      ],
+      [
+        139.6332,
+        35.5365
+      ],
+      [
+        139.6319,
+        35.5188
+      ],
+      [
+        139.6296,
+        35.5098
+      ],
+      [
+        139.6227,
+        35.5002
+      ],
+      [
+        139.6183,
+        35.4862
+      ],
+      [
+        139.6208,
+        35.4741
+      ]
+    ]
+  },
+  {
+    "id": "tokyo-private-1927-21",
+    "order": 22,
     "openedDate": "1927-04-16",
     "openedYear": 1927,
     "name": "高田馬場〜東村山",

@@ -10,6 +10,7 @@ const PRIVATE_COMPANY_COLORS: Record<string, string> = {
   武蔵野鉄道: "#2b55a2",
   池上電気鉄道: "#d6508f",
   目黒蒲田電鉄: "#e45c2b",
+  東京横浜電鉄: "#da532c",
   玉南電気鉄道: "#8a5a15",
   西武鉄道: "#00a6b2",
 };

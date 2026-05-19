@@ -305,6 +305,18 @@ export const ROUTE_GEOMETRY_OVERRIDES: Record<string, GeoPoint[]> = {
     { lat: 35.6588, lng: 139.6433 },
     { lat: 35.6661, lng: 139.6413 },
   ],
+  "tokyo-private-1926-21": [
+    { lat: 35.589, lng: 139.6688 },
+    { lat: 35.5806, lng: 139.6617 },
+    { lat: 35.5659, lng: 139.6545 },
+    { lat: 35.5536, lng: 139.6466 },
+    { lat: 35.5365, lng: 139.6332 },
+    { lat: 35.5188, lng: 139.6319 },
+    { lat: 35.5098, lng: 139.6296 },
+    { lat: 35.5002, lng: 139.6227 },
+    { lat: 35.4862, lng: 139.6183 },
+    { lat: 35.4741, lng: 139.6208 },
+  ],
   "tokyo-private-1927-21": [
     { lat: 35.7123, lng: 139.7037 },
     { lat: 35.7158, lng: 139.6952 },
