@@ -159,6 +159,19 @@ function firstOpeningYear(segments: RailwaySegment[], companyFilter: PrivateComp
   return years.length > 0 ? Math.min(...years) : null;
 }
 
+function focusStartYear(
+  segments: RailwaySegment[],
+  displayMode: DisplayMode,
+  companyFilter: PrivateCompanyFilter,
+  routeFilter: string,
+): number {
+  const targetYears = segments
+    .filter((segment) => matchesDisplayMode(segment, displayMode))
+    .filter((segment) => matchesPrivateFilters(segment, companyFilter, routeFilter))
+    .map((segment) => segment.openedYear);
+  return targetYears.length > 0 ? Math.min(...targetYears) : YEARS[0];
+}
+
 export function YamanoteHistoryMap() {
   const [data, setData] = useState<RailwayData>(EMPTY_DATA);
   const [selectedYear, setSelectedYear] = useState(1885);
@@ -242,6 +255,10 @@ export function YamanoteHistoryMap() {
   );
   const progressPercent = ((selectedYear - START_YEAR) / (END_YEAR - START_YEAR)) * 100;
   const yearSummary = summaryOverride ?? getYearSummary(data.summaries, selectedYear);
+  const playbackStartYear = useMemo(
+    () => focusStartYear(data.segments, displayMode, privateCompanyFilter, privateRouteFilter),
+    [data.segments, displayMode, privateCompanyFilter, privateRouteFilter],
+  );
 
   useEffect(() => {
     loadRailwayData()
@@ -701,7 +718,7 @@ export function YamanoteHistoryMap() {
             type="button"
             onClick={() => {
               if (selectedYear === YEARS[YEARS.length - 1]) {
-                setSelectedYear(YEARS[0]);
+                setSelectedYear(playbackStartYear);
               }
               setIsPlaying((current) => !current);
             }}
@@ -724,7 +741,7 @@ export function YamanoteHistoryMap() {
             type="button"
             onClick={() => {
               setIsPlaying(false);
-              setSelectedYear(YEARS[0]);
+              setSelectedYear(playbackStartYear);
             }}
           >
             最初へ
