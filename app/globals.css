@@ -221,10 +221,43 @@ h2 {
   background: #dcefeb;
 }
 
-.focus-controls {
+.preset-controls {
   position: absolute;
   z-index: 500;
   top: 58px;
+  left: 64px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-width: min(620px, calc(100% - 88px));
+  padding: 4px;
+  border: 1px solid rgba(217, 221, 214, 0.92);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.1);
+}
+
+.preset-controls button {
+  min-width: 48px;
+  height: 28px;
+  border: 0;
+  border-radius: 6px;
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.preset-controls button.active {
+  color: #0f4f48;
+  background: #dcefeb;
+}
+
+.focus-controls {
+  position: absolute;
+  z-index: 500;
+  top: 100px;
   left: 64px;
   display: flex;
   gap: 8px;
@@ -893,8 +926,30 @@ input[type="range"]::-moz-range-thumb {
     font-size: 11px;
   }
 
-  .focus-controls {
+  .preset-controls {
     top: 78px;
+    right: 10px;
+    left: 10px;
+    max-width: none;
+    flex-wrap: nowrap;
+    gap: 3px;
+    padding: 3px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .preset-controls::-webkit-scrollbar {
+    display: none;
+  }
+
+  .preset-controls button {
+    min-width: 44px;
+    height: 26px;
+    font-size: 11px;
+  }
+
+  .focus-controls {
+    top: 111px;
     right: 10px;
     left: 10px;
     max-width: none;

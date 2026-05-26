@@ -35,6 +35,7 @@ const PRIVATE_COMPANY_FILTERS = [
   { id: "keisei", label: "京成" },
   { id: "keikyu", label: "京急" },
 ] as const;
+const FOCUS_PRESETS = PRIVATE_COMPANY_FILTERS.filter((company) => company.id !== "all");
 const PRIVATE_FOCUS_SUMMARIES: Record<PrivateCompanyFilter, { title: string; body: string }> = {
   all: {
     title: "私鉄全体",
@@ -81,6 +82,14 @@ type RouteStyle = {
 };
 type DisplayMode = (typeof DISPLAY_MODES)[number]["id"];
 type PrivateCompanyFilter = (typeof PRIVATE_COMPANY_FILTERS)[number]["id"];
+
+function isDisplayMode(value: string | null): value is DisplayMode {
+  return DISPLAY_MODES.some((mode) => mode.id === value);
+}
+
+function isPrivateCompanyFilter(value: string | null): value is PrivateCompanyFilter {
+  return PRIVATE_COMPANY_FILTERS.some((company) => company.id === value);
+}
 
 function routeStyle(status: RailwayStatus): RouteStyle {
   const styles: Record<RailwayStatus, RouteStyle> = {
@@ -172,6 +181,14 @@ function focusStartYear(
   return targetYears.length > 0 ? Math.min(...targetYears) : YEARS[0];
 }
 
+function routeExists(segments: RailwaySegment[], companyFilter: PrivateCompanyFilter, routeFilter: string): boolean {
+  if (routeFilter === "all") return true;
+  return segments
+    .filter((segment) => segment.category === "private_railway")
+    .filter((segment) => matchesPrivateFilters(segment, companyFilter, "all"))
+    .some((segment) => segment.currentLineImage === routeFilter);
+}
+
 export function YamanoteHistoryMap() {
   const [data, setData] = useState<RailwayData>(EMPTY_DATA);
   const [selectedYear, setSelectedYear] = useState(1885);
@@ -184,6 +201,7 @@ export function YamanoteHistoryMap() {
   const [playbackInterval, setPlaybackInterval] = useState<(typeof PLAYBACK_SPEEDS)[number]["interval"]>(1000);
   const [isMapReady, setIsMapReady] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [hasLoadedUrlState, setHasLoadedUrlState] = useState(false);
   const mapElementRef = useRef<HTMLDivElement | null>(null);
   const leafletRef = useRef<typeof import("leaflet") | null>(null);
   const mapRef = useRef<LeafletMap | null>(null);
@@ -260,6 +278,18 @@ export function YamanoteHistoryMap() {
     [data.segments, displayMode, privateCompanyFilter, privateRouteFilter],
   );
 
+  const applyPrivateFocus = (companyFilter: PrivateCompanyFilter, routeFilter: string) => {
+    const safeRouteFilter = routeExists(data.segments, companyFilter, routeFilter) ? routeFilter : "all";
+    const firstYear = firstOpeningYear(data.segments, companyFilter, safeRouteFilter);
+    setDisplayMode("private");
+    setPrivateCompanyFilter(companyFilter);
+    setPrivateRouteFilter(safeRouteFilter);
+    setIsPlaying(false);
+    if (firstYear !== null) {
+      setSelectedYear(firstYear);
+    }
+  };
+
   useEffect(() => {
     loadRailwayData()
       .then(setData)
@@ -268,6 +298,48 @@ export function YamanoteHistoryMap() {
         console.error(error);
       });
   }, []);
+
+  useEffect(() => {
+    if (hasLoadedUrlState || data.segments.length === 0) return;
+
+    const params = new URLSearchParams(window.location.search);
+    const modeParam = params.get("mode");
+    const companyParam = params.get("company");
+    const routeParam = params.get("route");
+    const nextMode = isDisplayMode(modeParam) ? modeParam : "all";
+    const nextCompany = isPrivateCompanyFilter(companyParam) ? companyParam : "all";
+    const nextRoute = routeParam && routeExists(data.segments, nextCompany, routeParam) ? routeParam : "all";
+    const nextYearParam = Number(params.get("year"));
+    const nextYear = Number.isFinite(nextYearParam) ? nextYearParam : null;
+
+    setDisplayMode(nextMode);
+    setPrivateCompanyFilter(nextCompany);
+    setPrivateRouteFilter(nextRoute);
+
+    if (nextYear !== null && nextYear >= START_YEAR && nextYear <= END_YEAR) {
+      setSelectedYear(nextYear);
+    } else if (nextMode !== "all" || nextCompany !== "all" || nextRoute !== "all") {
+      setSelectedYear(focusStartYear(data.segments, nextMode, nextCompany, nextRoute));
+    }
+
+    setHasLoadedUrlState(true);
+  }, [data.segments, hasLoadedUrlState]);
+
+  useEffect(() => {
+    if (!hasLoadedUrlState) return;
+
+    const params = new URLSearchParams();
+    if (displayMode !== "all") params.set("mode", displayMode);
+    if (privateCompanyFilter !== "all") params.set("company", privateCompanyFilter);
+    if (privateRouteFilter !== "all") params.set("route", privateRouteFilter);
+    if (selectedYear !== focusStartYear(data.segments, displayMode, privateCompanyFilter, privateRouteFilter)) {
+      params.set("year", String(selectedYear));
+    }
+
+    const query = params.toString();
+    const nextUrl = `${window.location.pathname}${query ? `?${query}` : ""}${window.location.hash}`;
+    window.history.replaceState(null, "", nextUrl);
+  }, [data.segments, displayMode, hasLoadedUrlState, privateCompanyFilter, privateRouteFilter, selectedYear]);
 
   useEffect(() => {
     if (!mapElementRef.current || mapRef.current) return;
@@ -513,21 +585,25 @@ export function YamanoteHistoryMap() {
               </button>
             ))}
           </div>
+          <div className="preset-controls" aria-label="会社プリセット">
+            {FOCUS_PRESETS.map((preset) => (
+              <button
+                key={preset.id}
+                className={displayMode === "private" && privateCompanyFilter === preset.id && privateRouteFilter === "all" ? "active" : ""}
+                type="button"
+                onClick={() => applyPrivateFocus(preset.id, "all")}
+              >
+                {preset.label}
+              </button>
+            ))}
+          </div>
           <div className="focus-controls" aria-label="私鉄フォーカス">
             <label>
               <span>会社</span>
               <select
                 value={privateCompanyFilter}
                 onChange={(event) => {
-                  const nextCompany = event.target.value as PrivateCompanyFilter;
-                  const firstYear = firstOpeningYear(data.segments, nextCompany, "all");
-                  setDisplayMode("private");
-                  setPrivateCompanyFilter(nextCompany);
-                  setPrivateRouteFilter("all");
-                  if (firstYear !== null) {
-                    setIsPlaying(false);
-                    setSelectedYear(firstYear);
-                  }
+                  applyPrivateFocus(event.target.value as PrivateCompanyFilter, "all");
                 }}
               >
                 {PRIVATE_COMPANY_FILTERS.map((company) => (
@@ -542,14 +618,7 @@ export function YamanoteHistoryMap() {
               <select
                 value={privateRouteFilter}
                 onChange={(event) => {
-                  const nextRoute = event.target.value;
-                  const firstYear = firstOpeningYear(data.segments, privateCompanyFilter, nextRoute);
-                  setDisplayMode("private");
-                  setPrivateRouteFilter(nextRoute);
-                  if (firstYear !== null) {
-                    setIsPlaying(false);
-                    setSelectedYear(firstYear);
-                  }
+                  applyPrivateFocus(privateCompanyFilter, event.target.value);
                 }}
               >
                 <option value="all">すべて</option>
